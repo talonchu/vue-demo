@@ -16,13 +16,21 @@
     </el-header>
     <el-container style="height: 100%;">
       <el-aside width="12%" style="background-color: rgb(238, 241, 246); height: 90vh">
-        <el-menu>
+        <el-menu unique-opened mode="horizontal" menu-trigger="click">
           <el-submenu index="1">
             <template slot="title"><i class="el-icon-setting"></i>系统设置</template>
-            <el-menu-item-group>
-              <el-menu-item index="1-1">选项1</el-menu-item>
-              <el-menu-item index="1-2">选项2</el-menu-item>
-            </el-menu-item-group>
+            <el-submenu index="1-1">
+              <template slot="title">系统基础资料设置</template>
+              <router-link :to="'/fzhsxdy'"><el-menu-item index="1-1-1">辅助核算项定义项</el-menu-item></router-link>
+              <el-menu-item index="1-1-2">选项2</el-menu-item>
+              <el-menu-item index="1-1-3">选项3</el-menu-item>
+            </el-submenu>
+            <el-submenu index="2-5">
+              <template slot="title">账套基础资料设置</template>
+              <el-menu-item index="2-5-1">账套选项设置</el-menu-item>
+              <el-menu-item index="2-5-2">选项2</el-menu-item>
+              <el-menu-item index="2-5-3">选项3</el-menu-item>
+            </el-submenu>
           </el-submenu>
           <el-submenu index="2">
             <template slot="title"><i class="el-icon-goods"></i>期初处理</template>
@@ -62,6 +70,7 @@
           <el-submenu index="7">
             <template slot="title"><i class="el-icon-news"></i>报表账簿</template>
             <el-menu-item-group>
+              <router-link :to="'/bbcx'"><el-menu-item index="3-1">报表查询</el-menu-item></router-link>
               <el-menu-item index="7-1">选项1</el-menu-item>
               <el-menu-item index="7-2">选项2</el-menu-item>
             </el-menu-item-group>
@@ -126,5 +135,8 @@ export default {
 
 .el-menu {
   height: 100%;
+}
+a {
+  text-decoration: none
 }
 </style>

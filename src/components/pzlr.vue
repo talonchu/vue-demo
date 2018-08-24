@@ -95,7 +95,7 @@
             :visible.sync="uploadDialogVisible"
             width="30%">
             <template slot-scope="scope">
-              <Upload></Upload>
+              <Upload :val="val"></Upload>
             </template>
             <span slot="footer" class="dialog-footer">
               <el-button @click="uploadDialogVisible = false">取 消</el-button>
@@ -126,13 +126,14 @@
           width="160%"
           align="center">
           <template slot-scope="scope">
-            <PzlrAbstracts/>
+            <!-- selectedAbstract事件捕获子组件(摘要选择组件)传来的选中值，$event：传回来的值，scope.$index：当前行数 -->
+            <PzlrAbstracts v-on:selectedAbstract="selectedAbstract($event, scope.$index)"/>
           </template>
         </el-table-column>
         <el-table-column
           label="科目"
           width="550%"
-          align="left">
+          align="center">
           <template slot-scope="scope">
             <PzlrClasses/>
           </template>
@@ -185,6 +186,7 @@ export default {
   name: 'pzlr',
   data () {
     return {
+      val: '123456',
       tableData: [
         {}, {}, {}, {}
       ],
@@ -224,6 +226,11 @@ export default {
         tableData.splice(index, 1)
         console.log(tableData)
       }
+    },
+    // 接受子组件传过来的值
+    selectedAbstract: function (event, index) {
+      this.tableData[index].abstract = event
+      console.log(this.tableData)
     }
   }
 }

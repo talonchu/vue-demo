@@ -31,58 +31,77 @@
         border
         style="width: 100%"
         v-loading="loading"
-        element-loading-text="加载凭证列表">
+        element-loading-text="加载凭证列表"
+        @row-dblclick='showDetail($event)'
+        :empty-text="table_empty_text">
         <el-table-column
           :render-header="renderSelection">
-          <template slot-scope="scope">
-            <i class="el-icon-zoom-in" @click="dialogTableVisible = true"></i>
+          <template slot-scope="scope" v-if='scope.row.guid'>
+            <i class="el-icon-zoom-in" @click="showDetail(scope.row)" style="cursor:pointer"></i>
             <el-checkbox v-model="$store.state.select"></el-checkbox>
           </template>
         </el-table-column>
         <el-table-column
           prop="guid"
-          label="序号">
+          label="序号"
+          align='center'>
         </el-table-column>
         <el-table-column
           prop="date"
-          label="日期">
+          label="日期"
+          align='center'>
         </el-table-column>
         <el-table-column
           prop="no"
-          label="凭证号">
+          label="凭证号"
+          align='center'>
         </el-table-column>
         <el-table-column
           prop="status"
-          label="状态">
+          label="状态"
+          align='center'>
         </el-table-column>
         <el-table-column
           prop="type"
-          label="类型">
+          label="类型"
+          align='center'>
         </el-table-column>
         <el-table-column
           prop="abstract"
-          label="摘要">
+          label="摘要"
+          align='center'>
         </el-table-column>
         <el-table-column
           prop="class"
-          label="科目">
+          label="科目"
+          align='center'>
         </el-table-column>
         <el-table-column
           prop="jfje"
-          label="借方金额">
+          label="借方金额"
+          align='center'>
         </el-table-column>
         <el-table-column
           prop="dfje"
-          label="贷方金额">
+          label="贷方金额"
+          align='center'>
         </el-table-column>
         <el-table-column
           prop="hslx"
-          label="核算类型">
+          label="核算类型"
+          align='center'>
         </el-table-column>
       </el-table>
     </el-container>
-    <el-dialog title="凭证详情" :visible.sync="dialogTableVisible" width="1000px">
-      <el-table>
+    <el-pagination
+      @current-change="handleCurrentChange"
+      :current-page="currentPage"
+      :page-size="page_size"
+      layout="total, prev, pager, next, jumper"
+      :total="total_items">
+    </el-pagination>
+    <el-dialog title="凭证详情" :visible.sync="showDialog" width="1000px">
+      <el-table :data="detailData">
         <el-table-column property="date" label="日期" width="150"></el-table-column>
         <el-table-column property="no" label="凭证号" width="20mn0"></el-table-column>
         <el-table-column property="status" label="状态"></el-table-column>
@@ -104,13 +123,19 @@ export default {
   data () {
     return {
       tableData: [],
-      dialogTableVisible: false,
-      loading: false
+      showDialog: false,
+      loading: false,
+      detailData: [],
+      table_empty_text: '暂无数据',
+      page_size: 8,
+      currentPage: 1,
+      total_items: 0
     }
   },
   methods: {
-    showDetail: function (e) {
-      console.log(e.currentTarget)
+    showDetail: function (row) {
+      this.showDialog = !!row.abstract
+      this.detailData = [row]
     },
     renderSelection (h, {column}) {
       return h('span', [
@@ -124,19 +149,47 @@ export default {
     },
     selectAll: function () {
       this.$store.commit('selectAll')
+    },
+    handleCurrentChange (val) {
+      this.obtainTableData(val, this.page_size)
+    },
+    obtainTableData (currentPage, pagesize) {
+      var params = new URLSearchParams()
+      params.append('currentPage', currentPage)
+      params.append('pagesize', pagesize)
+      var self = this
+      self.loading = true
+      axios.post('/api/ext/user/ssotoken', params, {timeout: 1000 * 15}).then(function (response) {
+        self.tableData = response.data
+        let size = response.data.length
+        // 通过后台获取总数，这里测试
+        self.total_items = 37
+        //  如果数据不够撑满，添加空数据
+        let fullSize = 0.6 * document.documentElement.clientHeight / 48
+        if (size < fullSize) {
+          for (let i = 0; i < fullSize - size; i++) {
+            self.tableData.push({})
+          }
+          // self.tableData = self.tableData.concat((() => {
+          //   let it = [{}, {}, {}]
+          //   let items = []
+          //   it.forEach(() => items.push({}))
+          //   return items
+          // })())
+        }
+        self.loading = false
+      }).catch(error => {
+        self.loading = false
+        self.table_empty_text = '获取数据失败'
+        if (error.toString().search('timeout') !== -1) {
+          console.log('获取凭证列表超时')
+        }
+      })
     }
   },
-  created: function () {
-    var self = this
-    self.loading = true
-    axios.get('/api/ext/user/ssotoken')
-      .then(function (response) {
-        self.tableData = response.data
-        self.loading = false
-      })
-      .catch(function (response) {
-        console.log(response)
-      })
+  mounted: function () {
+    // 页面渲染好后请求数据
+    this.obtainTableData(this.currentPage, this.page_size)
   }
 }
 </script>
@@ -161,5 +214,8 @@ a {
 <style>
 .el-checkbox {
   margin-left: 40%
+}
+.el-table__row {
+  height: 48px
 }
 </style>

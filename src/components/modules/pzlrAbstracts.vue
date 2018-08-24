@@ -68,6 +68,8 @@ export default {
         checkedNodesList.push(item.label)
       })
       this.$refs.selectedAbstract.innerText = checkedNodesList.length > 0 ? checkedNodesList.toString() : '请选择摘要'
+      // 把此组件的值传给父组件
+      this.$emit('selectedAbstract', checkedNodesList.toString())
     },
     hideLabel: function () {
       this.showLabel = false

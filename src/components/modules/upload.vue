@@ -6,9 +6,8 @@
     :on-preview="handlePreview"
     :on-remove="handleRemove"
     :file-list="fileList"
-    :auto-upload="false"
-    :on-error="handleError">
-    <el-button slot="trigger" size="small">选取文件</el-button>
+    :auto-upload="false">
+    <el-button slot="trigger" size="small">选取文件{{val}}</el-button>
     <el-button style="margin-left: 10px;" size="small" @click="submitUpload">上传</el-button>
   </el-upload>
 </template>
@@ -16,6 +15,7 @@
 <script>
 export default {
   name: 'upload',
+  props: ['val'],
   data () {
     return {
       fileList: []
@@ -30,9 +30,6 @@ export default {
     },
     handlePreview (file) {
       console.log(file)
-    },
-    handleError (err, file, fileList) {
-      console.log('附件上传失败' + fileList.length)
     }
   }
 }
