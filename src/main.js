@@ -9,6 +9,7 @@ import Vuex from 'vuex'
 import store from './store/store'
 // import axios from 'axios'
 
+
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 Vue.use(Vuex)
